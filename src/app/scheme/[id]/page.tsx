@@ -6,9 +6,21 @@ import Footer from "@/components/footer";
 import { schemes } from "../data";
 import Image from "next/image";
 
+type Message = {
+  type: "user" | "ai";
+  text: string;
+};
+
+type Scheme = {
+  id: number;
+  title: string;
+  description: string;
+  steps: string[];
+};
+
 const SchemeDetailPage = ({ params }: { params: { id: number } }) => {
-  const [scheme, setScheme] = useState(null);
-  const [messages, setMessages] = useState([]);
+  const [scheme, setScheme] = useState<Scheme | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [userInput, setUserInput] = useState("");
 
   const { id } = params;
@@ -16,19 +28,22 @@ const SchemeDetailPage = ({ params }: { params: { id: number } }) => {
   useEffect(() => {
     if (id) {
       const foundScheme = schemes.find(
-        (scheme) => scheme.id === parseInt(id as any)
+        (scheme) => scheme.id === parseInt(id.toString())
       );
-      setScheme(foundScheme);
+      setScheme(foundScheme || null);
     }
   }, [id]);
 
   const handleSendMessage = () => {
     if (userInput.trim() !== "") {
-      setMessages([...messages, { type: "user", text: userInput }]);
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { type: "user", text: userInput },
+      ]);
       // Mock AI response
       setTimeout(() => {
-        setMessages([
-          ...messages,
+        setMessages((prevMessages) => [
+          ...prevMessages,
           { type: "user", text: userInput },
           { type: "ai", text: "यह एक नमूना उत्तर है।" },
         ]);
@@ -45,18 +60,18 @@ const SchemeDetailPage = ({ params }: { params: { id: number } }) => {
       <div className="container mx-auto p-4 h-full">
         <div className="flex flex-row items-center justify-between mb-4 gap-8">
           <div className="flex mt-4 flex-col items-center gap-1 w-1/2">
-          <h1 className="text-xl font-bold mb-4">{scheme.title}</h1>
-          <p className="mb-4">{scheme.description}</p>
-          <h2 className="text-2xl font-bold mb-2">योजना प्राप्त करने के चरण</h2>
-          <ul className="list-disc pl-6 mb-8">
-            {scheme.steps.map((step, index) => (
-              <li key={index} className="mb-2">
-                {step}
-              </li>
-            ))}
-          </ul>
+            <h1 className="text-xl font-bold mb-4">{scheme.title}</h1>
+            <p className="mb-4">{scheme.description}</p>
+            <h2 className="text-2xl font-bold mb-2">योजना प्राप्त करने के चरण</h2>
+            <ul className="list-disc pl-6 mb-8">
+              {scheme.steps.map((step, index) => (
+                <li key={index} className="mb-2">
+                  {step}
+                </li>
+              ))}
+            </ul>
           </div>
-          <div className="bg-white w-2/3  p-4 rounded shadow-md">
+          <div className="bg-white w-2/3 p-4 rounded shadow-md">
             <h3 className="text-xl font-bold mb-2">
               AI सहायक के साथ बातचीत करें
             </h3>
@@ -84,14 +99,14 @@ const SchemeDetailPage = ({ params }: { params: { id: number } }) => {
                 placeholder="संदेश लिखें..."
               />
               <button
-              onClick={handleSendMessage}
-              className="bg-blue-500 text-white px-4 py-2 rounded-r"
-            >
-              <Image src="/mic.png" alt="Send" width={20} height={20} />
-            </button>
-              <button
                 onClick={handleSendMessage}
                 className="bg-blue-500 text-white px-4 py-2 rounded-r"
+              >
+                <Image src="/mic.png" alt="Send" width={20} height={20} />
+              </button>
+              <button
+                onClick={handleSendMessage}
+                className="bg-blue-500 text-white px-4 py-2 rounded-r ml-1"
               >
                 भेजें
               </button>

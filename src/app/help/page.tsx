@@ -5,17 +5,25 @@ import Image from "next/image";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 
+type Message = {
+  type: "user" | "ai";
+  text: string;
+};
+
 export default function HelpPage() {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [userInput, setUserInput] = useState("");
 
   const handleSendMessage = () => {
     if (userInput.trim() !== "") {
-      setMessages([...messages, { type: "user", text: userInput }]);
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { type: "user", text: userInput },
+      ]);
       // Mock AI response
       setTimeout(() => {
-        setMessages([
-          ...messages,
+        setMessages((prevMessages) => [
+          ...prevMessages,
           { type: "user", text: userInput },
           { type: "ai", text: "यह एक नमूना उत्तर है।" },
         ]);
@@ -57,7 +65,7 @@ export default function HelpPage() {
               />
             </div>
           </div>
-          <div className="flex">
+          <div className="flex w-full">
             <input
               type="text"
               value={userInput}
@@ -73,7 +81,7 @@ export default function HelpPage() {
             </button>
             <button
               onClick={handleSendMessage}
-              className="bg-blue-500 text-white px-4 py-2 rounded-r"
+              className="bg-blue-500 text-white px-4 py-2 rounded-r ml-1"
             >
               भेजें
             </button>
